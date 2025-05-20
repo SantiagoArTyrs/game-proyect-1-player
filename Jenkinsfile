@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     CI = "false" 
-    VERCEL_TOKEN = credentials('29ba965c-8726-4391-8900-d1ea365a5754') 
+    VERCEL_TOKEN = credentials('vercel-token') 
   }
 
   stages {
