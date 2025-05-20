@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    CI = "false" // Desactiva que React trate los warnings como errores
-    VERCEL_TOKEN = credentials('vercel-token') // Token (si se usa despliegue, si no, puedes quitarlo)
+    CI = "false" 
+    VERCEL_TOKEN = credentials('29ba965c-8726-4391-8900-d1ea365a5754') 
   }
 
   stages {
