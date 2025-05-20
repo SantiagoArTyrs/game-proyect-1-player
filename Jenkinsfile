@@ -1,38 +1,66 @@
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Instalar dependencias') {
-            steps {
-                dir('game-project') {
-                    sh 'npm install'
-                }
-            }
-        }
+  environment {
+    CI = "false" // Desactiva que React trate los warnings como errores
+    VERCEL_TOKEN = credentials('vercel-token') // Token (si se usa despliegue, si no, puedes quitarlo)
+  }
 
-        stage('Pruebas unitarias') {
-            steps {
-                dir('game-project') {
-                    sh 'npm run test'
-                }
-            }
-        }
-
-        stage('Compilar el proyecto') {
-            steps {
-                dir('game-project') {
-                    sh 'npm run build'
-                }
-            }
-        }
+  stages {
+    stage('Declarative: Checkout SCM') {
+      steps {
+        checkout scm
+      }
     }
 
-    post {
-        success {
-            echo '✅ Pipeline ejecutado con éxito.'
-        }
-        failure {
-            echo '❌ Falló la ejecución del pipeline.'
-        }
+    stage('Tool Install') {
+      steps {
+        tool name: 'Node 20', type: 'nodejs'
+      }
     }
+
+    stage('Clean workspace') {
+      steps {
+        deleteDir()
+      }
+    }
+
+    stage('Checkout') {
+      steps {
+        git url: 'https://github.com/guswill24/node-project.git', branch: 'main'
+      }
+    }
+
+    stage('Install dependencies') {
+      steps {
+        bat 'npm install --legacy-peer-deps'
+      }
+    }
+
+    stage('Run tests') {
+      steps {
+        bat 'npm test -- --watchAll=false'
+      }
+    }
+
+    stage('Build app') {
+      steps {
+        bat 'npm run build'
+      }
+    }
+  }
+
+  post {
+    success {
+      echo "✅ Pipeline ejecutado correctamente. Build exitoso."
+    }
+
+    failure {
+      echo "❌ Error en alguna etapa del pipeline. Revisar los logs."
+    }
+
+    always {
+      echo "📦 Pipeline finalizado (éxito o fallo). Puedes revisar el historial."
+    }
+  }
 }
